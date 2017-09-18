@@ -1,25 +1,45 @@
-
-from conans import ConanFile
-from conans.tools import download, check_sha256
+import os, shutil
+from conans import ConanFile, CMake
+from conans.tools import download, check_sha256, unzip
 
 class HowardHinnantDate(ConanFile):
     name = 'date'
-    version = ''
+    version = '2.2.3'
     description = 'A date and time library based on the C++11/14/17 <chrono> header'
     url = 'https://github.com/rhazari/conan-date'
-    license = 'https://github.com/HowardHinnant/date/blob/master/LICENSE.txt'
-    settings = None
+    license = 'https://github.com/rhazari/date/blob/{!s}-cmake/LICENSE.txt'.format(version)
+    settings = 'os', 'compiler', 'arch', 'build_type'
+    exports_sources = 'CMakeLists.txt', 'tzdata*'
+    generators = 'cmake'
+
+    @property
+    def _archive_dirname(self):
+        return 'date-{!s}-cmake'.format(self.version)
+
+    def _get_build_dir(self):
+        return os.getcwd()
+
+    def _run_cmake(self):
+        extra_defs = {}
+        cmake = CMake(self, parallel=True)
+        cmake.configure(defs=extra_defs, build_dir=self._get_build_dir(), source_dir=self.conanfile_directory)
+        return cmake
 
     def source(self):
-        download_url = 'https://raw.githubusercontent.com/HowardHinnant/date/v2.2/date.h'
-        download(download_url, 'date.h')
-        check_sha256('date.h', 'a500c2a1ebee8e1a6bf524416e7c94ac71203cf715c5181714691b5206145db6')
+        download_url = 'https://github.com/rhazari/date/archive/{!s}-cmake.zip'.format(self.version)
+        download(download_url, 'date.zip')
+        check_sha256('date.zip','43b7a48702d465976374c618cff141b8fb08e16500914d663d555c735b7951e0')
+        unzip('date.zip')
+        os.unlink('date.zip')
+        os.rename(self._archive_dirname, 'date')
 
     def build(self):
-        return  # do nothing - header only
+        cmake = self._run_cmake()    # rerun cmake
+        cmake.build()
 
     def package(self):
-        self.copy(pattern='date.h', dst='include/date')
+        self.copy(pattern='*.h', dst='include/')
+        self.copy(pattern='*.cpp', dst='src/')
 
     def package_id(self):
         self.info.header_only()
