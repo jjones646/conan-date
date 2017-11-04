@@ -1,11 +1,6 @@
 from conans import ConanFile, CMake
 import os
 
-username = os.getenv('CONAN_USERNAME', 'rhazarika')
-os.environ['CONAN_USERNAME'] = username
-channel = os.getenv('CONAN_CHANNEL', 'testing')
-os.environ['CONAN_CHANNEL'] = channel
-os.environ['CONAN_LOG_RUN_TO_FILE'] = os.getenv('CONAN_LOG_RUN_TO_FILE', '1')
 
 class DateConanPackageTest(ConanFile):
     settings =  {
@@ -14,7 +9,6 @@ class DateConanPackageTest(ConanFile):
                     'arch': None,
                     'build_type': ['Release', 'Debug']
                 }
-    requires = 'date/2.2.3@{!s}/{!s}'.format(username, channel)
     generators = 'cmake'
     build_policy = 'missing'
 
