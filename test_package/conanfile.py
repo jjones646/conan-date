@@ -3,12 +3,12 @@ import os
 
 
 class DateConanPackageTest(ConanFile):
-    settings =  {
-                    'os': None,
-                    'compiler': None,
-                    'arch': None,
-                    'build_type': ['Release', 'Debug']
-                }
+    settings = {
+        'os': None,
+        'compiler': None,
+        'arch': None,
+        'build_type': ['Release', 'Debug']
+    }
     generators = 'cmake'
     build_policy = 'missing'
 
